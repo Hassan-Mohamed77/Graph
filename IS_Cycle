@@ -1,0 +1,17 @@
+vector<vector<int>> adj;
+vector<bool>vs;
+bool iscycle;
+void init(int n){
+    adj.assign(n + 1, {});
+    vs.assign(n + 1, {});
+}
+void dfs(int u,int par){
+    vs[u] = 1;
+    for(auto it:adj[u]){
+        if(not vs[it]){
+            dfs(it, u);
+        }
+        else if (par != it)
+            iscycle = 1;
+    }
+}
