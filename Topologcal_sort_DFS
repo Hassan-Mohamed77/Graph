@@ -1,0 +1,11 @@
+vector<int> ans;
+bool vis[N];
+
+void dfs(int u)
+{
+    vis[u] = true;
+    for (auto v : adj[u])
+        if (!vis[v])
+            dfs(v);
+    ans.push_back(u);
+}

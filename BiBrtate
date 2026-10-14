@@ -1,0 +1,11 @@
+void dfs(int u, int c)
+{
+    color[u] = c;
+    for (auto v : adj[u])
+    {
+        if (color[v] == -1)
+            dfs(v, 1 - c);
+        else if (color[v] == color[u])
+            ok = false;
+    }
+}

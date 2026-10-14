@@ -1,0 +1,99 @@
+void solve();
+
+struct SCC {
+    int n;
+    vector<vector<int>> adj, rev_adj, comp, dag;
+    vector<int> out, curr_path, roots, id, ou, in;
+    vector<bool> vis;
+
+    SCC(int N, vector<vector<int>> graph) {
+        n = N;
+        adj = graph;
+        rev_adj.assign(n + 1, {});
+        vis.assign(n + 1, false);
+        roots.assign(n + 1, 0);
+        ou.assign(n + 1, 0);
+        in.assign(n + 1, 0);
+        id.assign(n + 1, -1);
+        for (int u = 1; u <= n; u++) {
+            for (int v : adj[u]) {
+                rev_adj[v].push_back(u);
+            }
+        }
+        build();
+    }
+
+    void dfs0(int u) {
+        vis[u] = true;
+        for (int v : adj[u]) {
+            if (!vis[v]) {
+                dfs0(v);
+            }
+        }
+        out.push_back(u);
+    }
+
+    void dfs1(int u) {
+        vis[u] = true;
+        curr_path.push_back(u);
+        for (int v : rev_adj[u]) {
+            if (!vis[v]) {
+                dfs1(v);
+            }
+        }
+    }
+
+    void build() {
+        for (int i = 1; i <= n; i++) {
+            if (!vis[i]) {
+                dfs0(i);
+            }
+        }
+        reverse(out.begin(), out.end());
+        vis.assign(n + 1, false);
+        for (int v : out) {
+            if (vis[v]) {
+                continue;
+            }
+            curr_path.clear();
+            dfs1(v);
+            comp.push_back(curr_path);
+            int root = curr_path.front();
+            roots.push_back(root);
+            for (int u : curr_path) {
+                id[u] = root;
+            }
+        }
+        dag.assign(n + 1, {});
+        for (int u = 1; u <= n; u++) {
+            for (int v : adj[u]) {
+                if (id[u] != id[v]) {
+                    ou[id[u]]++, in[id[v]]++;
+                    dag[id[u]].push_back(id[v]);
+                }
+            }
+        }
+    }
+};
+
+void solve() {
+    int n, m;
+    cin >> n >> m;
+    vector<vector<int>> ad(n + 1);
+    for (int i = 0, u, v; i < m; i++) {
+        cin >> u >> v;
+        ad[u].push_back(v);
+    }
+    SCC s(n, ad);
+    if (s.comp.size() == 1) {
+        cout << 0 << '\n';
+    } else {
+        int a = 0, b = 0;
+        for (auto x : s.comp) {
+            auto c = x[0];
+            if (s.in[s.id[c]] == 0) a++;
+            if (s.ou[s.id[c]] == 0) b++;
+        }
+        cout << max(a, b) << '\n';
+    }
+}

@@ -1,0 +1,66 @@
+vector<vector<int> > adj;
+vector<int> in; /// in-degree of each node
+int n; // number of nodes
+vector<int> res;
+
+bool Topological() {
+    queue<int> q;
+    res.clear();
+    for (int i = 0; i < n; ++i)
+        if (in[i] == 0) q.push(i);
+
+    while (!q.empty()) {
+        int u = q.front();
+        q.pop();
+        res.emplace_back(u);
+        for (int v: adj[u])
+            if (!--in[v])
+                q.push(v);
+    }
+    return res.size() == n;
+}
+
+//////////////////////////////////////////////////////////////
+
+void solve() {
+    int n, m;
+    cin >> n >> m;
+    vector<vector<int>> adj(n + 1);
+    vector<int> indegree(n + 1, 0);
+
+    for (int i = 0; i < m; i++) {
+        int u, v;
+        cin >> u >> v;
+        adj[u].push_back(v);
+        indegree[v]++;
+    }
+
+    queue<int> q;
+    for (int i = 1; i <= n; i++) {
+        if (indegree[i] == 0) q.push(i);
+    }
+
+    vector<int> order; // topological sort use BFS
+
+    while (!q.empty()) {
+        int u = q.front();
+        order.push_back(u);
+        q.pop();
+
+        for (auto v : adj[u]) {
+            indegree[v]--;
+            if (indegree[v] == 0) {
+                q.push(v);
+            }
+        }
+    }
+
+    if (sz(order) != n) {
+        cout << "NO" << endl;
+    } else {
+        cout << "YES" << endl;
+        for (auto v : order) {
+            cout << v << " ";
+        }
+    }
+}
